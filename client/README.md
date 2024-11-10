@@ -10,10 +10,10 @@ Debemos implementar un juego en el que debemos clickear el color que diga la pal
 - Al llegar a 10 el tiempo debe detenerse y mostrar un botón de "Reiniciar" para permitirle al usuario volver a jugar.
 
 ## Extras
-- Implementar un tablero de puntajes más alto.
-- Persistir el tablero al refrescar la página.
-- Ver los resultados de otros jugadores en el tablero.
-- Agregar dificultades.
+- Implementar un tablero de puntajes más alto. (Desarrollado ✅)
+- Persistir el tablero al refrescar la página. (Desarrollado ✅)
+- Ver los resultados de otros jugadores en el tablero. (Desarrollado ✅)
+- Agregar dificultades. (Sin Desarrollar ❌)
   - Fácil: Errar no descuenta puntos.
   - Medio: Errar descuenta un punto.
   - Díficil: Errar descuenta tres puntos.
