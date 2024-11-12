@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
+
+
 type Color = {
   name: string;
   color: string;
@@ -84,7 +88,7 @@ function App() {
   }
 
   function handleSaveGame() {
-    fetch("http://localhost:5000/save-game", {
+    fetch(`${apiUrl}/save-game`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -113,7 +117,7 @@ function App() {
   }, []);
 
   function fetchBestTimes() {
-    fetch("http://localhost:5000/best-times", {
+    fetch(`${apiUrl}/best-times`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
