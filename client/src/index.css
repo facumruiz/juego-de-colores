@@ -40,11 +40,9 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 4rem;
+  font-size: 6rem;
   font-weight: bold;
-  -webkit-text-stroke: 2px #242424;
-  
-
+  -webkit-text-stroke: 2px #000000;
 }
 
 header, footer {
@@ -71,12 +69,6 @@ button {
   cursor: pointer;
 }
 
-.color-button{
-  width: 100px;
-  height: 100px;
-  margin: 10px;
-}
-
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -87,5 +79,13 @@ button {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+
+/* Adjust font size for section in mobile */
+@media (max-width: 768px) {
+  section {
+    font-size: 3rem;
   }
 }
