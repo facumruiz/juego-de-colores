@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-
-
 type Color = {
   name: string;
   color: string;
@@ -23,7 +21,6 @@ const COLORS: Color[] = [
   { name: "gris", color: '#808080', correct: false },
   { name: "celeste", color: '#00bfff', correct: false },
   { name: "marrón", color: '#8b4513', correct: false },
-
 ];
 
 function App() {
@@ -35,17 +32,10 @@ function App() {
   const [previousCorrectColor, setPreviousCorrectColor] = useState<Color | null>(null);
   const [showSaveModal, setShowSaveModal] = useState<boolean>(false);
   const [userName, setUserName] = useState<string>("");
-  const [bestTimes, setBestTimes] = useState<any[]>([]); // Almacenará los mejores tiempos
+  const [bestTimes, setBestTimes] = useState<any[]>([]);
 
   const correctColor = useMemo<Color>(() => gameColors.find((color) => color.correct)!, [gameColors]);
   const incorrectColor = useMemo<Color>(() => gameColors.find((color) => !color.correct)!, [gameColors]);
-  // Función para obtener la medalla
-  function getMedal(index: number) {
-    if (index === 0) return "🥇"; // Oro
-    if (index === 1) return "🥈"; // Plata
-    if (index === 2) return "🥉"; // Bronce
-    return ""; // Para el resto de las posiciones no mostrar medalla
-  }
 
   function handlePlay() {
     setStatus("playing");
@@ -102,18 +92,17 @@ function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Game saved:", data);
+        console.log("Juego guardado:", data);
         setShowSaveModal(false);
       })
-      .catch((error) => console.error("Error saving game:", error));
+      .catch((error) => {
+        console.error("Error guardando el juego:", error);
+      });
   }
 
-  // Este useEffect ahora actualiza la tabla de mejores tiempos cada 5 segundos
+  // Obtener los mejores tiempos al cargar el componente
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchBestTimes();
-    }, 5000); // Actualiza cada 5 segundos
-    return () => clearInterval(interval); // Limpiar el intervalo cuando el componente se desmonte
+    fetchBestTimes();
   }, []);
 
   function fetchBestTimes() {
@@ -125,16 +114,16 @@ function App() {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Error al obtener los mejores tiempos");
+          throw new Error("Error en la respuesta de la API");
         }
         return response.json();
       })
       .then((data) => {
-        console.log(data);
-        setBestTimes(data);  // Actualiza los mejores tiempos
+        console.log("Mejores tiempos recibidos:", data);
+        setBestTimes(data);
       })
       .catch((error) => {
-        console.error("Error fetching best times:", error);
+        console.error("Error obteniendo los mejores tiempos:", error);
       });
   }
 
@@ -145,9 +134,7 @@ function App() {
         setTime((time) => time + 10);
       }, 10);
     }
-    return () => {
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, [status]);
 
   const formatTime = (time: number) => {
@@ -156,73 +143,66 @@ function App() {
     return `${seconds}.${milliseconds < 10 ? "0" : ""}${milliseconds}`;
   };
 
+  const getMedal = (index: number) => {
+    if (index === 0) return "🥇";
+    if (index === 1) return "🥈";
+    if (index === 2) return "🥉";
+    return "";
+  };
+
+  // Condicional para ajustar el tamaño de `main`
+  const mainStyle = {
+    display: "grid",
+    textAlign: "center",
+    height: status === "finished" ? "50vh" : "100vh", // Cambiar a 40vh cuando esté en 'finished'
+    width: "100vw",
+    gridTemplateRows: status === "finished" ? "60px 1fr 60px" : "60px 1fr 60px",
+  };
+
   return (
-    <main>
-      <header style={{ backgroundColor: "#242424", color: "#fff", padding: "1em", textAlign: "center" }}>
+    <main style={mainStyle} className="app">
+      <header className="header">
         <h1>{score} puntos</h1>
-        <h1>{formatTime(time)} segundos</h1>
+        <h1>{formatTime(time)} s</h1>
       </header>
 
       {status === "playing" && (
-        <section style={{ backgroundColor: incorrectColor.color, padding: "2em", textAlign: "center" }}>
-          <span style={{ textTransform: "capitalize", color: correctColor.color }}>
+        <section className="section" style={{ backgroundColor: incorrectColor.color }}>
+          <span className="correct-color" style={{ textTransform: "capitalize", color: correctColor.color }}>
             {correctColor.name}
           </span>
         </section>
       )}
 
       {status === "playing" && (
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "20px" }}>
+        <div className="button-container">
           {gameColors.map((color) => (
             <button
               key={color.name}
               onClick={() => handleColorClick(color)}
-              style={{
-                backgroundColor: color.color,
-                width: "100px",  // Tamaño más grande
-                height: "100px", // Tamaño más grande
-                borderRadius: "0", // Hacer los botones cuadrados
-                border: "none",
-                cursor: "pointer",
-                boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
-                transition: "transform 0.3s",  // Efecto al hacer hover
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")} // Efecto de hover
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")} // Restablecer tamaño al quitar el hover
-
+              className="color-button"
+              style={{ backgroundColor: color.color }}
             />
           ))}
         </div>
       )}
 
       {status === "finished" && (
-        <div
-          style={{
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
-            color: "#fff",
-            padding: "2em",
-            textAlign: "center",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            borderRadius: "10px",
-          }}
-        >
+        <div className="overlay">
           <h2>¡Juego terminado!</h2>
           <p>Tu tiempo: {formatTime(time)}</p>
           <p>Errores cometidos: {errors}</p>
 
           <button onClick={() => setShowSaveModal(true)}>Guardar 💾</button>
-
           <button onClick={handlePlay}>Volver a jugar! 🔁</button>
+        </div>
+      )}
 
-
-
-
-          {/* Mostrar la tabla de mejores tiempos directamente */}
-          <div style={{ marginTop: "2em" }}>
-            <h3>Mejores Tiempos 🏆</h3>
+      {/* Mostrar la tabla de mejores tiempos solo si el juego ha terminado */}
+      {status === "finished" && (
+        <div >
+          <h3>Mejores Tiempos 🏆</h3>
+          {bestTimes.length > 0 ? (
             <table style={{ margin: "0 auto", width: "80%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
@@ -240,20 +220,22 @@ function App() {
                   return (
                     <tr key={index}>
                       <td style={{ padding: "10px" }}>
-                        {getMedal(index)} {index <= 2 ? '' : index + 1}
+                        {getMedal(index)} {index + 1}
                       </td>
                       <td style={{ padding: "10px" }}>{bestTime._id}</td>
-                      <td style={{ padding: "10px", whiteSpace: "nowrap" }}>{formattedTime}<span style={{ fontSize: "1em" }}>s</span></td>
+                      <td style={{ padding: "10px", whiteSpace: "nowrap" }}>
+                        {formattedTime}
+                        <span style={{ fontSize: "1em" }}>s</span>
+                      </td>
                       <td style={{ padding: "10px" }}>{bestTime.errors}</td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-          </div>
-
-
-
+          ) : (
+            <p>Cargando los mejores tiempos...</p>
+          )}
         </div>
       )}
 
@@ -269,7 +251,7 @@ function App() {
             left: "50%",
             transform: "translate(-50%, -50%)",
             borderRadius: "10px",
-            width: "50%",
+            width: "80%",
             boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
           }}
         >
