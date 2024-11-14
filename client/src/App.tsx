@@ -37,7 +37,7 @@ function App() {
   const [userName, setUserName] = useState<string>("");
   const [bestTimes, setBestTimes] = useState<any[]>([]); // Almacenará los mejores tiempos
   const [loadingBestTimes, setLoadingBestTimes] = useState<boolean>(false);
-
+  const [countdown, setCountdown] = useState<number>(3);
 
   const correctColor = useMemo<Color>(() => gameColors.find((color) => color.correct)!, [gameColors]);
   const incorrectColor = useMemo<Color>(() => gameColors.find((color) => !color.correct)!, [gameColors]);
@@ -56,6 +56,7 @@ function App() {
     setErrors(0);
     setPreviousCorrectColor(null);
     setNewColors();
+    setCountdown(3);
   }
 
   function setNewColors() {
@@ -113,17 +114,21 @@ function App() {
 
   useEffect(() => {
     let interval: number;
-    if (status === "playing") {
+    if (status === "playing" && countdown === 0) {
       interval = setInterval(() => {
-        setTime((time) => time + 1);
+        setTime((time) => time + 10);
       }, 10);
+    } else if (countdown > 0) {
+      interval = setInterval(() => {
+        setCountdown((countdown) => countdown - 1);
+      }, 1000); // Disminuye el contador cada 1 segundo
     } else if (status === "finished") {
       fetchBestTimes(); // Carga la tabla solo cuando se finaliza por primera vez
     }
     return () => {
       clearInterval(interval);
     };
-  }, [status]);
+  }, [status, countdown]);
 
   function fetchBestTimes() {
     setLoadingBestTimes(true);  // Inicia el loader
@@ -151,17 +156,7 @@ function App() {
       });
   }
 
-  useEffect(() => {
-    let interval: number;
-    if (status === "playing") {
-      interval = setInterval(() => {
-        setTime((time) => time + 10);
-      }, 10);
-    }
-    return () => {
-      clearInterval(interval);
-    };
-  }, [status]);
+
 
   const formatTime = (time: number) => {
     const seconds = Math.floor(time / 1000);
@@ -176,15 +171,21 @@ function App() {
         color: "#fff",
         padding: "1em",
         textAlign: "center",
-        position: "sticky", // Añade esta propiedad para que el header sea sticky
-        top: 0, // Hace que se quede en la parte superior
-        zIndex: 10, // Asegura que esté encima de otros elementos si es necesario
+        position: "sticky", 
+        top: 0, 
+        zIndex: 10, 
       }}>
         <h1>{score} puntos</h1>
         <h1>{formatTime(time)} s</h1>
       </header>
 
-      {status === "playing" && (
+      {status === "playing" && countdown > 0 && (
+        <section style={{ backgroundColor: "#242424", padding: "2em", textAlign: "center" }}>
+          <h2 style={{ color: "#fff", fontSize: "2em" }}>{countdown}</h2>
+        </section>
+      )}
+
+      {status === "playing" && countdown === 0 && (
         <section style={{ backgroundColor: incorrectColor.color, padding: "2em", textAlign: "center" }}>
           <span style={{ textTransform: "capitalize", color: correctColor.color }}>
             {correctColor.name}
@@ -192,7 +193,7 @@ function App() {
         </section>
       )}
 
-      {status === "playing" && (
+      {status === "playing" && countdown === 0 && (
         <div style={{ display: "flex", justifyContent: "center", gap: "15px", marginTop: "20px", height: "150px" }}>
           {gameColors.map((color) => (
             <button
@@ -210,12 +211,9 @@ function App() {
               }}
               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")} // Efecto de hover
               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")} // Restablecer tamaño al quitar el hover
-
             />
-          
           ))}
         </div>
-        
       )}
 
       {status === "finished" && (
