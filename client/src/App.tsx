@@ -171,9 +171,9 @@ function App() {
         color: "#fff",
         padding: "1em",
         textAlign: "center",
-        position: "sticky", 
-        top: 0, 
-        zIndex: 10, 
+        position: "sticky",
+        top: 0,
+        zIndex: 10,
       }}>
         <h1>{score} puntos</h1>
         <h1>{formatTime(time)} s</h1>
@@ -194,66 +194,39 @@ function App() {
       )}
 
       {status === "playing" && countdown === 0 && (
-        <div style={{ display: "flex", justifyContent: "center", gap: "15px", marginTop: "20px", height: "150px" }}>
+        <div className="color-buttons-container">
           {gameColors.map((color) => (
             <button
               key={color.name}
               onClick={() => handleColorClick(color)}
-              style={{
-                backgroundColor: color.color,
-                width: "185px",  
-                height: "220px", 
-                borderRadius: "0", 
-                border: "none",
-                cursor: "pointer",
-                boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
-                transition: "transform 0.3s",  
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")} // Efecto de hover
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")} // Restablecer tamaño al quitar el hover
+              className="color-button"
+              style={{ backgroundColor: color.color }}
             />
           ))}
         </div>
       )}
 
       {status === "finished" && (
-        <div
-          style={{
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
-            color: "#fff",
-            padding: "2em",
-            textAlign: "center",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            borderRadius: "10px",
-          }}
-        >
+        <div className="finished-overlay">
           <h2>¡Juego terminado!</h2>
           <p>Tu tiempo: {formatTime(time)}</p>
           <p>Errores cometidos: {errors}</p>
 
           <button onClick={() => setShowSaveModal(true)}>Guardar 💾</button>
-
           <button onClick={handlePlay}>Volver a jugar! 🔁</button>
 
-
-
-
-          {/* Mostrar la tabla de mejores tiempos directamente */}
           <div style={{ marginTop: "2em" }}>
             <h3>Mejores Tiempos 🏆</h3>
-            {loadingBestTimes ? (  // Mostrar loader mientras se cargan los tiempos
+            {loadingBestTimes ? (
               <p>Cargando...</p>
             ) : (
-              <table style={{ margin: "0 auto", width: "80%", borderCollapse: "collapse" }}>
+              <table className="best-times-table">
                 <thead>
                   <tr>
-                    <th style={{ padding: "10px" }}>Pos.</th>
-                    <th style={{ padding: "10px" }}>Nombre</th>
-                    <th style={{ padding: "10px" }}>⏱️</th>
-                    <th style={{ padding: "10px" }}>❌</th>
+                    <th>Pos.</th>
+                    <th>Nombre</th>
+                    <th>⏱️</th>
+                    <th>❌</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -263,12 +236,14 @@ function App() {
 
                     return (
                       <tr key={index}>
-                        <td style={{ padding: "10px" }}>
+                        <td>
                           {getMedal(index)} {index <= 2 ? '' : index + 1}
                         </td>
-                        <td style={{ padding: "10px" }}>{bestTime._id}</td>
-                        <td style={{ padding: "10px", whiteSpace: "nowrap" }}>{formattedTime}<span style={{ fontSize: "1em" }}>s</span></td>
-                        <td style={{ padding: "10px" }}>{bestTime.errors}</td>
+                        <td>{bestTime._id}</td>
+                        <td className="no-wrap">
+                          {formattedTime}<span style={{ fontSize: "1em" }}>s</span>
+                        </td>
+                        <td>{bestTime.errors}</td>
                       </tr>
                     );
                   })}
@@ -276,11 +251,9 @@ function App() {
               </table>
             )}
           </div>
-
-
-
         </div>
       )}
+
 
       {showSaveModal && (
         <div
