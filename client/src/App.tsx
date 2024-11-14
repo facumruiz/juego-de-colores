@@ -171,7 +171,15 @@ function App() {
 
   return (
     <main>
-      <header style={{ backgroundColor: "#242424", color: "#fff", padding: "1em", textAlign: "center" }}>
+      <header style={{
+        backgroundColor: "#242424",
+        color: "#fff",
+        padding: "1em",
+        textAlign: "center",
+        position: "sticky", // Añade esta propiedad para que el header sea sticky
+        top: 0, // Hace que se quede en la parte superior
+        zIndex: 10, // Asegura que esté encima de otros elementos si es necesario
+      }}>
         <h1>{score} puntos</h1>
         <h1>{formatTime(time)} s</h1>
       </header>
@@ -185,27 +193,29 @@ function App() {
       )}
 
       {status === "playing" && (
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "20px" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "20px", height: "150px" }}>
           {gameColors.map((color) => (
             <button
               key={color.name}
               onClick={() => handleColorClick(color)}
               style={{
                 backgroundColor: color.color,
-                width: "100px",  // Tamaño más grande
-                height: "100px", // Tamaño más grande
-                borderRadius: "0", // Hacer los botones cuadrados
+                width: "140px",  
+                height: "135px", 
+                borderRadius: "0", 
                 border: "none",
                 cursor: "pointer",
                 boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
-                transition: "transform 0.3s",  // Efecto al hacer hover
+                transition: "transform 0.3s",  
               }}
               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")} // Efecto de hover
               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")} // Restablecer tamaño al quitar el hover
 
             />
+          
           ))}
         </div>
+        
       )}
 
       {status === "finished" && (

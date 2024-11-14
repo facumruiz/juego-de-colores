@@ -45,6 +45,10 @@ section {
   -webkit-text-stroke: 2px #000000;
 }
 
+
+
+
+
 header, footer {
   background-color: #242424;
   display: flex;
@@ -52,6 +56,7 @@ header, footer {
   justify-content: center;
   gap: 36px;
 }
+
 
 h1 {
   font-size: 1.5em;
