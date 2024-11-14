@@ -193,15 +193,15 @@ function App() {
       )}
 
       {status === "playing" && (
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "20px", height: "150px" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: "15px", marginTop: "20px", height: "150px" }}>
           {gameColors.map((color) => (
             <button
               key={color.name}
               onClick={() => handleColorClick(color)}
               style={{
                 backgroundColor: color.color,
-                width: "140px",  
-                height: "135px", 
+                width: "185px",  
+                height: "220px", 
                 borderRadius: "0", 
                 border: "none",
                 cursor: "pointer",
