@@ -92,5 +92,17 @@ button {
 @media (max-width: 768px) {
   section {
     font-size: 3rem;
+    height: 600px
+
+  
+  }
+
+  body{
+    min-height: 0px;
+  }
+
+  main{
+    height: 0px;
+   
   }
 }
