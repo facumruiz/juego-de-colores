@@ -36,6 +36,8 @@ function App() {
   const [showSaveModal, setShowSaveModal] = useState<boolean>(false);
   const [userName, setUserName] = useState<string>("");
   const [bestTimes, setBestTimes] = useState<any[]>([]); // Almacenará los mejores tiempos
+  const [loadingBestTimes, setLoadingBestTimes] = useState<boolean>(false);
+
 
   const correctColor = useMemo<Color>(() => gameColors.find((color) => color.correct)!, [gameColors]);
   const incorrectColor = useMemo<Color>(() => gameColors.find((color) => !color.correct)!, [gameColors]);
@@ -104,19 +106,27 @@ function App() {
       .then((data) => {
         console.log("Game saved:", data);
         setShowSaveModal(false);
+        fetchBestTimes();
       })
       .catch((error) => console.error("Error saving game:", error));
   }
 
-  // Este useEffect ahora actualiza la tabla de mejores tiempos cada 5 segundos
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchBestTimes();
-    }, 5000); // Actualiza cada 5 segundos
-    return () => clearInterval(interval); // Limpiar el intervalo cuando el componente se desmonte
-  }, []);
+    let interval: number;
+    if (status === "playing") {
+      interval = setInterval(() => {
+        setTime((time) => time + 10);
+      }, 10);
+    } else if (status === "finished") {
+      fetchBestTimes(); // Carga la tabla solo cuando se finaliza por primera vez
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [status]);
 
   function fetchBestTimes() {
+    setLoadingBestTimes(true);  // Inicia el loader
     fetch(`${apiUrl}/best-times`, {
       method: "GET",
       headers: {
@@ -131,10 +141,13 @@ function App() {
       })
       .then((data) => {
         console.log(data);
-        setBestTimes(data);  // Actualiza los mejores tiempos
+        setBestTimes(data); // Actualiza los mejores tiempos
       })
       .catch((error) => {
         console.error("Error fetching best times:", error);
+      })
+      .finally(() => {
+        setLoadingBestTimes(false);  // Detiene el loader
       });
   }
 
@@ -223,33 +236,37 @@ function App() {
           {/* Mostrar la tabla de mejores tiempos directamente */}
           <div style={{ marginTop: "2em" }}>
             <h3>Mejores Tiempos 🏆</h3>
-            <table style={{ margin: "0 auto", width: "80%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  <th style={{ padding: "10px" }}>Pos.</th>
-                  <th style={{ padding: "10px" }}>Nombre</th>
-                  <th style={{ padding: "10px" }}>⏱️</th>
-                  <th style={{ padding: "10px" }}>❌</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bestTimes.map((bestTime, index) => {
-                  const timeInSeconds = parseFloat(bestTime.time) / 1000; // Convierte el tiempo de milisegundos a segundos
-                  const formattedTime = timeInSeconds.toFixed(1); // Mantiene 2 decimales
+            {loadingBestTimes ? (  // Mostrar loader mientras se cargan los tiempos
+              <p>Cargando...</p>
+            ) : (
+              <table style={{ margin: "0 auto", width: "80%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th style={{ padding: "10px" }}>Pos.</th>
+                    <th style={{ padding: "10px" }}>Nombre</th>
+                    <th style={{ padding: "10px" }}>⏱️</th>
+                    <th style={{ padding: "10px" }}>❌</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bestTimes.map((bestTime, index) => {
+                    const timeInSeconds = parseFloat(bestTime.time) / 1000;
+                    const formattedTime = timeInSeconds.toFixed(1);
 
-                  return (
-                    <tr key={index}>
-                      <td style={{ padding: "10px" }}>
-                        {getMedal(index)} {index <= 2 ? '' : index + 1}
-                      </td>
-                      <td style={{ padding: "10px" }}>{bestTime._id}</td>
-                      <td style={{ padding: "10px", whiteSpace: "nowrap" }}>{formattedTime}<span style={{ fontSize: "1em" }}>s</span></td>
-                      <td style={{ padding: "10px" }}>{bestTime.errors}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                    return (
+                      <tr key={index}>
+                        <td style={{ padding: "10px" }}>
+                          {getMedal(index)} {index <= 2 ? '' : index + 1}
+                        </td>
+                        <td style={{ padding: "10px" }}>{bestTime._id}</td>
+                        <td style={{ padding: "10px", whiteSpace: "nowrap" }}>{formattedTime}<span style={{ fontSize: "1em" }}>s</span></td>
+                        <td style={{ padding: "10px" }}>{bestTime.errors}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
           </div>
 
 
