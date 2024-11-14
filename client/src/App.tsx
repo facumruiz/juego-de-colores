@@ -115,7 +115,7 @@ function App() {
     let interval: number;
     if (status === "playing") {
       interval = setInterval(() => {
-        setTime((time) => time + 10);
+        setTime((time) => time + 1);
       }, 10);
     } else if (status === "finished") {
       fetchBestTimes(); // Carga la tabla solo cuando se finaliza por primera vez
@@ -166,7 +166,7 @@ function App() {
   const formatTime = (time: number) => {
     const seconds = Math.floor(time / 1000);
     const milliseconds = Math.floor((time % 1000) / 10);
-    return `${seconds}.${milliseconds < 10 ? "0" : ""}${milliseconds}`;
+    return `${seconds}.${milliseconds.toString().padStart(2, "0")}`;
   };
 
   return (
